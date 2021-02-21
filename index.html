@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      #game-container {
+        margin-top: 25px;
+      }
+
+      .container {
+        margin: 5px 0 0 0;
+        padding: 0;
+        display: block;
+        float: left;
+      }
+
+      .container p {
+        width: 20px;
+        height: 20px;
+        margin: 5px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid black;
+      }
+
+      .container p:hover {
+        cursor: pointer;
+      }
+
+      #playerDisplay {
+        font-family: "Courier New", Courier, monospace;
+      }
+    </style>
+    <style id="boxUpdate"></style>
+    <style id="playerStyling"></style>
+  </head>
+  <body>
+    <div id="game-container">
+      <div>
+        <h1 id="playerDisplay">Player 1's turn!</h1>
+      </div>
+      <div class="container">
+        <p id="space0"></p>
+        <p id="space3"></p>
+        <p id="space6"></p>
+      </div>
+      <div class="container">
+        <p id="space1"></p>
+        <p id="space4"></p>
+        <p id="space7"></p>
+      </div>
+      <div class="container">
+        <p id="space2"></p>
+        <p id="space5"></p>
+        <p id="space8"></p>
+      </div>
+    </div>
+    <div class="container">
+      <button id="resetButton">Reset Game</button>
+    </div>
+    <script>
+      let xoSwitch = [true];
+
+      function playerColorHover() {
+        document.getElementById("playerStyling").innerHTML = "";
+        if (xoSwitch[xoSwitch.length - 1]) {
+          let playerStyle = document.createTextNode(
+            ".container p:hover {background-color: blue;}"
+          );
+          document.getElementById("playerStyling").appendChild(playerStyle);
+        } else if (!xoSwitch[xoSwitch.length - 1]) {
+          let playerStyle = document.createTextNode(
+            ".container p:hover {background-color: red;}"
+          );
+          document.getElementById("playerStyling").appendChild(playerStyle);
+        }
+      }
+
+      document
+        .getElementById("resetButton")
+        .addEventListener("click", resetBoard);
+      resetBoard();
+
+      console.log(xoSwitch.length);
+      function addSelection(e) {
+        //Checks what player turn it is
+        if (e.target.innerHTML == "") {
+          if (xoSwitch[xoSwitch.length - 1]) {
+            e.target.innerHTML = "X";
+            e.target.style.color = "blue";
+            let updatedBoxStyle = document.createTextNode(
+              "#" + e.target.id + " {background-color: white; cursor: default;}"
+            );
+            document.getElementById("boxUpdate").appendChild(updatedBoxStyle);
+            document.getElementById("playerDisplay").innerHTML =
+              "Player 2's turn!";
+            xoSwitch.push(!xoSwitch[xoSwitch.length - 1]);
+          } else if (!xoSwitch[xoSwitch.length - 1]) {
+            e.target.innerHTML = "O";
+            e.target.style.color = "red";
+            let updatedBoxStyle = document.createTextNode(
+              "#" + e.target.id + " {background-color: white; cursor: default;}"
+            );
+            document.getElementById("boxUpdate").appendChild(updatedBoxStyle);
+            document.getElementById("playerDisplay").innerHTML =
+              "Player 1's turn!";
+            xoSwitch.push(!xoSwitch[xoSwitch.length - 1]);
+          }
+        }
+        //Checks max game length reached
+        if (xoSwitch.length == 10) {
+          for (i = 0; i < 9; i++) {
+            document
+              .getElementById("space" + i)
+              .removeEventListener("click", addSelection);
+          }
+          document.getElementById("playerDisplay").innerHTML = "Draw game!";
+        }
+        playerColorHover();
+        console.log(xoSwitch);
+        winCheck();
+      }
+
+      function resetBoard() {
+        for (i = 0; i < 9; i++) {
+          document.getElementById("space" + i).innerHTML = "";
+          document
+            .getElementById("space" + i)
+            .addEventListener("click", addSelection);
+        }
+        xoSwitch = [true];
+        document.getElementById("playerDisplay").innerHTML = "Player 1's turn!";
+        document.getElementById("boxUpdate").innerHTML = "";
+        document.getElementById("playerStyling").innerHTML = "";
+
+        playerColorHover();
+      }
+      winningArr = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+      function winCheck() {
+        xArr = [];
+        oArr = [];
+        for (i = 0; i < 9; i++) {
+          if (document.getElementById("space" + i).innerHTML == "X") {
+            xArr.push(i);
+          } else if (document.getElementById("space" + i).innerHTML == "O") {
+            oArr.push(i);
+          }
+        }
+
+        for (arr in winningArr) {
+          xCounter = 0;
+          oCounter = 0;
+          for (num in winningArr[arr]) {
+            if (xArr.includes(winningArr[arr][num])) {
+              xCounter += 1;
+              if (xCounter == 3) {
+                document.getElementById("playerDisplay").innerHTML =
+                  "Player 1 Wins!";
+                for (i = 0; i < 9; i++) {
+                  document
+                    .getElementById("space" + i)
+                    .removeEventListener("click", addSelection);
+                  let updatedBoxStyle = document.createTextNode(
+                    "#space" +
+                      i +
+                      " {background-color: white; cursor: default;}"
+                  );
+                  document
+                    .getElementById("boxUpdate")
+                    .appendChild(updatedBoxStyle);
+                }
+              }
+            } else if (oArr.includes(winningArr[arr][num])) {
+              oCounter += 1;
+              if (oCounter == 3) {
+                document.getElementById("playerDisplay").innerHTML =
+                  "Player 2 Wins!";
+                for (i = 0; i < 9; i++) {
+                  document
+                    .getElementById("space" + i)
+                    .removeEventListener("click", addSelection);
+                  let updatedBoxStyle = document.createTextNode(
+                    "#space" +
+                      i +
+                      " {background-color: white; cursor: default;}"
+                  );
+                  document
+                    .getElementById("boxUpdate")
+                    .appendChild(updatedBoxStyle);
+                }
+              }
+            }
+          }
+        }
+        console.log("Player One: " + xArr);
+        console.log("Player Two: " + oArr);
+      }
+    </script>
+  </body>
+</html>
